@@ -479,6 +479,7 @@ const S = {
   port: JSON.parse(localStorage.getItem('lf_p') || '[]'),
   als:  JSON.parse(localStorage.getItem('lf_a') || '[]'),
   news: [],
+  dolar: null,
 };
 const GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 function server() { return S.srv || 'http://localhost:3001'; }
@@ -531,13 +532,12 @@ const ld = () => '<div class="dots"><i></i><i></i><i></i></div>';
 const sys_base = `Sos un asesor de cedears para un inversor argentino moderado que sabe poco de finanzas. Hablás en español rioplatense, muy directo y simple. Nunca usás tecnicismos. Siempre decís exactamente qué hacer.`;
 
 // ═══ HOY ════════════════════════════════════════════════
-const NEWS = [
-  { src:'Bloomberg',     title:'Nvidia sube 3.2%: chips IA superan estimaciones del trimestre', time:'1h',  tk:'NVDA', imp:'positive' },
-  { src:'Reuters',       title:'Apple planea nueva línea: analistas suben precio objetivo a $240', time:'2h', tk:'AAPL', imp:'positive' },
-  { src:'Yahoo Finance', title:'Tesla recorta producción en China ante caída de ventas', time:'3h', tk:'TSLA', imp:'negative' },
-  { src:'Google Finance',title:'MercadoLibre: transacciones en Argentina crecen 38% interanual', time:'4h', tk:'MELI', imp:'positive' },
-  { src:'Infobae',       title:'Dólar blue sube $12: qué pasa con los cedears esta semana', time:'5h', tk:'ARG',  imp:'neutral' },
-  { src:'El Cronista',   title:'BCRA compra reservas por tercer día: señal positiva para el mercado', time:'6h', tk:'ARG', imp:'positive' },
+// Noticias se cargan desde el servidor en tiempo real
+const NEWS_FALLBACK = [
+  { src:'Yahoo Finance', title:'Mercados globales atentos a datos económicos de la semana', time:'Hoy', tk:'SPY', imp:'neutral' },
+  { src:'Infobae',       title:'Cedears: qué sectores lideran las subas en el mercado local', time:'Hoy', tk:'ARG', imp:'positive' },
+  { src:'El Cronista',   title:'Dólar y reservas: el BCRA interviene en la jornada cambiaria', time:'Hoy', tk:'ARG', imp:'neutral' },
+  { src:'MarketWatch',   title:'Wall Street opera mixto a la espera de resultados corporativos', time:'Hoy', tk:'SPY', imp:'neutral' },
 ];
 
 function mkDecision() {
@@ -592,13 +592,41 @@ function mkWA() {
     </div>`;
 }
 
-function mkNews() {
-  S.news = NEWS;
+async function mkNews() {
   const impMap = { positive:['pg','↑ Positivo'], negative:['pr','↓ Negativo'], neutral:['py','→ Neutro'] };
-  document.getElementById('news-card').innerHTML = NEWS.map(n => {
+  const card = document.getElementById('news-card');
+  card.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2)"><div class=\"dots\"><i></i><i></i><i></i></div><div style=\"margin-top:8px;font-size:12px\">Cargando noticias en tiempo real...</div></div>';
+
+  // Intentar cargar del servidor
+  let noticias = NEWS_FALLBACK;
+  if (S.srv) {
+    try {
+      const r = await fetch(S.srv + '/noticias');
+      const d = await r.json();
+      if (d.ok && d.noticias?.length) noticias = d.noticias;
+    } catch(e) { console.log('Noticias fallback:', e.message); }
+  }
+
+  // Cargar dólar blue
+  if (S.srv) {
+    try {
+      const r = await fetch(S.srv + '/dolar');
+      const d = await r.json();
+      if (d.ok && d.dolar) {
+        S.dolar = d.dolar;
+        // Agregar noticia del dólar si hay datos
+        if (d.dolar.blue) {
+          noticias.unshift({ src:'Dólar API', title:`💵 Dólar blue: $${d.dolar.blue.toLocaleString('es-AR')} | MEP: $${d.dolar.mep?.toLocaleString('es-AR')||'–'} | CCL: $${d.dolar.ccl?.toLocaleString('es-AR')||'–'}`, time:'Ahora', tk:'ARG', imp:'neutral' });
+        }
+      }
+    } catch(e) { console.log('Dólar fallback:', e.message); }
+  }
+
+  S.news = noticias;
+  card.innerHTML = noticias.map(n => {
     const [cls,lbl] = impMap[n.imp]||['py','Neutro'];
     return `<div class="ni">
-      <div class="ni-src"><span>${n.src}</span><span style="color:var(--ln2)">·</span><span>Hace ${n.time}</span>${n.tk!=='ARG'?`<span class="pill pb" style="font-size:9px">${n.tk}</span>`:''}</div>
+      <div class="ni-src"><span>${n.src}</span><span style="color:var(--ln2)">·</span><span>${n.time}</span>${n.tk!=='ARG'?`<span class="pill pb" style="font-size:9px">${n.tk}</span>`:''}</div>
       <div class="ni-title">${n.title}</div>
       <span class="pill ${cls}">${lbl}</span>
     </div>`;
@@ -628,8 +656,23 @@ const CEDEARS = [
   {ticker:'MSFT', name:'Microsoft',  sector:'Tecnología',  color:'#00a4ef', pe:32.1, chg:0.4,  score:68},
 ];
 
-function mkRecs() {
-  document.getElementById('recs-wrap').innerHTML = CEDEARS.slice(0,4).map(c => {
+async function mkRecs() {
+  // Intentar cargar datos reales del servidor (Yahoo Finance / estilo Finviz)
+  let cedears = CEDEARS;
+  if (S.srv) {
+    try {
+      const r = await fetch(S.srv + '/mercado');
+      const d = await r.json();
+      if (d.ok && d.cedears?.length) {
+        // Combinar con info de nombre/sector de CEDEARS local
+        cedears = d.cedears.map(q => {
+          const local = CEDEARS.find(c => c.ticker === q.ticker) || {};
+          return { ...local, ...q, chg: q.change };
+        }).filter(c => c.name);
+      }
+    } catch(e) { console.log('Mercado fallback:', e.message); }
+  }
+  document.getElementById('recs-wrap').innerHTML = cedears.slice(0,4).map(c => {
     const cc = c.chg>=0?'var(--g)':'var(--r)', sign=c.chg>=0?'+':'';
     const [scls,slbl] = c.score>=72?['pg','▲ COMPRAR']:c.score>=58?['py','◆ MANTENER']:['pr','▼ VENDER'];
     const ten = c.score>=72?'1-3 sem':c.score>=65?'1-2 meses':'Revisar';
@@ -838,7 +881,7 @@ if(!S.key) {
   }, 500);
 }
 
-mkDecision(); mkWA(); mkNews(); mkRecs(); mkAlertas();
+mkDecision(); mkWA(); mkNews(); mkRecs(); mkAlertas(); // async - run in parallel
 if(S.port.length) renderCartera();
 if(S.tok){ setIOL(true); cargarIOL(); }
 </script>

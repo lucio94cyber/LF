@@ -130,10 +130,37 @@ function detectImpact(t) {
 }
 
 function detectTicker(t) {
-  const map = { apple:'AAPL', nvidia:'NVDA', tesla:'TSLA', mercadolibre:'MELI', microsoft:'MSFT', google:'GOOGL', alphabet:'GOOGL', meta:'META', amazon:'AMZN', jpmorgan:'JPM' };
+  const map = {
+    apple:'AAPL', iphone:'AAPL', ipad:'AAPL',
+    nvidia:'NVDA', 'geforce':'NVDA',
+    tesla:'TSLA', elon:'TSLA',
+    mercadolibre:'MELI', 'mercado libre':'MELI',
+    microsoft:'MSFT', azure:'MSFT',
+    google:'GOOGL', alphabet:'GOOGL', youtube:'GOOGL',
+    meta:'META', facebook:'META', instagram:'META', whatsapp:'META',
+    amazon:'AMZN', aws:'AMZN',
+    jpmorgan:'JPM', 'jp morgan':'JPM',
+    alibaba:'BABA', 'ali baba':'BABA',
+    netflix:'NFLX',
+    intel:'INTC',
+    amd:'AMD',
+    shopify:'SHOP',
+    spotify:'SPOT',
+    disney:'DIS',
+    'bank of america':'BAC',
+    goldman:'GS',
+    exxon:'XOM', chevron:'CVX',
+    pfizer:'PFE',
+    'coca cola':'KO', cocacola:'KO',
+    walmart:'WMT',
+    'dow jones':'SPY', 'wall street':'SPY', 's&p':'SPY', nasdaq:'QQQ',
+    cedear:'ARG', byma:'ARG', merval:'ARG', bcra:'ARG', dolar:'ARG',
+  };
   const tl = t.toLowerCase();
   for (const [k,v] of Object.entries(map)) { if (tl.includes(k)) return v; }
-  for (const tk of ['AAPL','NVDA','TSLA','MELI','MSFT','GOOGL','META','AMZN','JPM','XOM']) { if (t.includes(tk)) return tk; }
+  for (const tk of ['AAPL','NVDA','TSLA','MELI','MSFT','GOOGL','META','AMZN','JPM','XOM','NFLX','AMD','INTC','SHOP','BABA','DIS','KO','WMT']) {
+    if (t.includes(tk)) return tk;
+  }
   return 'ARG';
 }
 
@@ -142,18 +169,45 @@ async function fetchNoticias() {
   if (Date.now() - cache.noticias.ts < TTL_N && cache.noticias.data.length) return cache.noticias.data;
 
   const fuentes = [
-    { url: 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=AAPL,NVDA,TSLA,MELI,MSFT&region=US&lang=en-US', src: 'Yahoo Finance' },
-    { url: 'https://www.infobae.com/arc/outboundfeeds/rss/category/economia/', src: 'Infobae' },
-    { url: 'https://www.cronista.com/arc/outboundfeeds/rss/', src: 'El Cronista' },
+    // Yahoo Finance — noticias por cedear específico
+    { url: 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=AAPL,NVDA,TSLA,MELI,MSFT,META,AMZN,GOOGL,BABA,JPM&region=US&lang=en-US', src: 'Yahoo Finance' },
+    // MarketWatch — mercados y Wall Street
     { url: 'https://feeds.content.dowjones.io/public/rss/mw_marketpulse', src: 'MarketWatch' },
+    // Infobae — sección mercados específica
+    { url: 'https://www.infobae.com/arc/outboundfeeds/rss/category/mercados/', src: 'Infobae Mercados' },
+    // El Cronista — sección finanzas y mercados
+    { url: 'https://www.cronista.com/arc/outboundfeeds/rss/category/finanzas-mercados/', src: 'El Cronista Mercados' },
+    // Investing.com — noticias de acciones y cedears
+    { url: 'https://www.investing.com/rss/news_25.rss', src: 'Investing.com' },
   ];
+
+  // Solo noticias que impactan cedears e inversiones
+  const KEYWORDS_OK = [
+    'stock','stocks','market','markets','shares','nasdaq','dow jones','s&p','wall street',
+    'earnings','revenue','profit','loss','fed','rate','inflation','gdp','economia','economía',
+    'apple','nvidia','tesla','microsoft','google','alphabet','meta','amazon','mercadolibre',
+    'meli','netflix','jpmorgan','alibaba','intel','amd','shopify','spotify','disney',
+    'aapl','nvda','tsla','msft','googl','amzn','nflx','jpm','baba',
+    'cedear','byma','merval','bcra','dólar','dolar','reservas','bolsa','acciones',
+    'inversión','inversion','invertir','financiero','mercado financiero',
+    'acción','accion','bono','fondo','etf','cripto','bitcoin',
+    'oil','energy','tech','technology','semiconductor','ai','artificial intelligence',
+    'bank','banking','finance','fintech','pharma','petróleo','minería',
+  ];
+
+  function esRelevante(title) {
+    const tl = title.toLowerCase();
+    return KEYWORDS_OK.some(kw => tl.includes(kw));
+  }
 
   let todas = [];
   for (const f of fuentes) {
     try {
       const r = await httpGet(f.url);
       if (r.s === 200 && r.b && r.b.includes('<item>')) {
-        parseRSS(r.b).slice(0, 3).forEach(item => {
+        const items = parseRSS(r.b);
+        const relevantes = items.filter(item => esRelevante(item.title));
+        relevantes.slice(0, 4).forEach(item => {
           todas.push({
             src: f.src,
             title: item.title,

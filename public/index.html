@@ -475,14 +475,14 @@ const S = {
   key:  localStorage.getItem('lf_k') || '',
   tok:  localStorage.getItem('lf_t') || '',
   wa:   localStorage.getItem('lf_w') || '',
-  srv:  localStorage.getItem('lf_s') || '',   // Render URL
+  srv:  localStorage.getItem('lf_s') || 'https://lf-m7nn.onrender.com',   // Render URL
   port: JSON.parse(localStorage.getItem('lf_p') || '[]'),
   als:  JSON.parse(localStorage.getItem('lf_a') || '[]'),
   news: [],
   dolar: null,
 };
 const GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-function server() { return S.srv || 'http://localhost:3001'; }
+function server() { return S.srv || 'https://lf-m7nn.onrender.com'; }
 
 // ═══ PWA ════════════════════════════════════════════════
 let deferredPrompt = null;

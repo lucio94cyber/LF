@@ -169,16 +169,17 @@ async function fetchNoticias() {
   if (Date.now() - cache.noticias.ts < TTL_N && cache.noticias.data.length) return cache.noticias.data;
 
   const fuentes = [
-    // Yahoo Finance — noticias por cedear específico
-    { url: 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=AAPL,NVDA,TSLA,MELI,MSFT,META,AMZN,GOOGL,BABA,JPM&region=US&lang=en-US', src: 'Yahoo Finance' },
-    // MarketWatch — mercados y Wall Street
-    { url: 'https://feeds.content.dowjones.io/public/rss/mw_marketpulse', src: 'MarketWatch' },
-    // Infobae — sección mercados específica
-    { url: 'https://www.infobae.com/arc/outboundfeeds/rss/category/mercados/', src: 'Infobae Mercados' },
-    // El Cronista — sección finanzas y mercados
-    { url: 'https://www.cronista.com/arc/outboundfeeds/rss/category/finanzas-mercados/', src: 'El Cronista Mercados' },
-    // Investing.com — noticias de acciones y cedears
-    { url: 'https://www.investing.com/rss/news_25.rss', src: 'Investing.com' },
+    // Yahoo Finance — cedears principales (más confiable)
+    { url: 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=AAPL,NVDA,TSLA,MELI,MSFT&region=US&lang=en-US', src: 'Yahoo Finance' },
+    { url: 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=META,AMZN,GOOGL,JPM,XOM&region=US&lang=en-US', src: 'Yahoo Finance' },
+    // Seeking Alpha — análisis de acciones
+    { url: 'https://seekingalpha.com/market_currents.xml', src: 'Seeking Alpha' },
+    // Reuters — mercados globales
+    { url: 'https://feeds.reuters.com/reuters/businessNews', src: 'Reuters' },
+    // Infobae Economía
+    { url: 'https://www.infobae.com/arc/outboundfeeds/rss/category/economia/', src: 'Infobae' },
+    // El Cronista
+    { url: 'https://www.cronista.com/arc/outboundfeeds/rss/', src: 'El Cronista' },
   ];
 
   // Solo noticias que impactan cedears e inversiones

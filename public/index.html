@@ -466,14 +466,11 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);min-height:100
 
 <!-- BOTTOM NAV -->
 <nav class="nav">
-  <button class="nb on"  onclick="ir('hoy',0)"><span class="ic"></span><span class="lb">HOY</span></button>
-  <button class="nb"     onclick="ir('inv',1)"><span class="ic"></span><span class="lb">INVERTIR</span></button>
-  <button class="nb"     onclick="ir('cart',2)"><span class="ic"></span><span class="lb">CARTERA</span></button>
-  <button class="nb"     onclick="ir('al',3)"><span class="ic"></span><span class="lb">ALERTAS</span></button>
-  <button class="tab-btn" onclick="showTab('tab-cedears')"> Buscador CEDEARs</button>
-  <button class="tab-btn" onclick="showTab('tab-dolar'); cargarDolares();">Dólar en Vivo</button>
-  <button class="tab-btn" onclick="showTab('tab-simulador')">Simulador</button>
-  <button class="nb"     onclick="ir('aj',4)"><span class="ic"></span><span class="lb">AJUSTES</span></button>
+  <button class="nb on" onclick="ir('hoy',0)"><span class="ic">🏠</span><span class="lb">HOY</span></button>
+  <button class="nb"    onclick="ir('inv',1)"><span class="ic">📈</span><span class="lb">INVERTIR</span></button>
+  <button class="nb"    onclick="ir('cedears',2)"><span class="ic">🔍</span><span class="lb">CEDEARS</span></button>
+  <button class="nb"    onclick="ir('dolar',3)"><span class="ic">💵</span><span class="lb">DÓLAR</span></button>
+  <button class="nb"    onclick="ir('aj',4)"><span class="ic">⚙️</span><span class="lb">AJUSTES</span></button>
 </nav>
 
 <!-- IOL MODAL -->
@@ -526,11 +523,57 @@ if ('serviceWorker' in navigator) {
 }
 
 // ═══ NAV ════════════════════════════════════════════════
-function ir(name, idx) {
+async function ir(name, idx) {
+  // 1. Manejo de paneles existentes
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
-  document.getElementById('p-' + name).classList.add('on');
+  const panelActual = document.getElementById('p-' + name);
+  if (panelActual) panelActual.classList.add('on');
+
+  // 2. Manejo de botones de navegación
   document.querySelectorAll('.nb').forEach((b, i) => b.classList.toggle('on', i === idx));
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // 3. LÓGICA NUEVA PARA DATOS EN VIVO
+  // Si tocamos un botón que no tiene un panel físico en el HTML, usamos un panel genérico
+  if (name === 'dolar' || name === 'cedears' || name === 'simulador') {
+    // Usamos el panel de 'Invertir' como contenedor temporal para mostrar estos datos
+    const cont = document.getElementById('p-inv');
+    cont.classList.add('on');
+    
+    if (name === 'dolar') {
+      cont.innerHTML = `<div class="sh">Dólar en tiempo real</div>
+                        <div class="card" id="lista-dolares" style="padding:10px">Cargando datos vivos...</div>
+                        <button class="btn btn-s" onclick="location.reload()" style="margin:10px; width:calc(100% - 20px)">← Volver</button>`;
+      
+      try {
+        const res = await fetch(`${S.srv}/cotizaciones-completas`);
+        const data = await res.json();
+        let html = '';
+        data.forEach(d => {
+          const esNaranja = d.nombre.toLowerCase().includes('tarjeta'); 
+          html += `<div class="ni" style="${esNaranja ? 'background:var(--gs);border:1px solid var(--g);border-radius:12px;margin-bottom:8px' : ''}">
+              <div class="ni-src">${d.nombre} ${esNaranja ? '⭐ MEJOR PRECIO' : ''}</div>
+              <div class="ni-title">Venta: $${d.venta}</div>
+          </div>`;
+        });
+        document.getElementById('lista-dolares').innerHTML = html;
+      } catch(e) {
+        document.getElementById('lista-dolares').innerHTML = '<div class="ia-resp">Error al conectar con el servidor Render.</div>';
+      }
+    }
+
+    if (name === 'cedears') {
+      cont.innerHTML = `
+        <div class="sh">Buscador de Oportunidades</div>
+        <div class="card" style="padding:20px">
+          <label class="lbl">Ticker del Cedear</label>
+          <input class="inp" id="in-cedear" placeholder="Ej: AAPL">
+          <button class="btn btn-g" style="margin-top:10px" onclick="analizarVivo()">Analizar Score 0-100</button>
+          <div id="res-cedear" style="margin-top:20px"></div>
+        </div>
+        <button class="btn btn-s" onclick="location.reload()" style="margin:0 16px; width:calc(100% - 32px)">← Volver</button>`;
+    }
+  }
 }
 
 // ═══ CLAUDE ═════════════════════════════════════════════

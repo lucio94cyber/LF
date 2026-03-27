@@ -1114,35 +1114,45 @@ mkDecision(); mkWA(); mkNews(); mkRecs(); mkAlertas(); // async - run in paralle
 if(S.port.length) renderCartera();
 if(S.tok){ setIOL(true); cargarIOL(); }
 
-  async function analizarVivo() {
+ async function analizarVivo() {
   const t = document.getElementById('in-cedear').value.toUpperCase();
   if(!t) return;
   
   const resCont = document.getElementById('res-cedear');
-  resCont.innerHTML = ld();
+  resCont.innerHTML = ld(); // Muestra los puntitos de carga
   
   try {
-    const res = await fetch(`${S.srv}/analizar-cedear?ticker=${t}`);
+    // Usamos la URL de tu Render que está activa
+    const res = await fetch(`https://lf-m7nn.onrender.com/analizar-cedear?ticker=${t}`);
     const d = await res.json();
     
-    const colorClass = d.score > 70 ? 'dec-buy' : d.score > 40 ? 'dec-hold' : 'dec-sell';
+    if(!d || d.error) throw new Error(d.error || 'No se hallaron datos');
+
+    // IMPORTANTE: Tu server manda 'puntuacion' y 'recomendacion'
+    const score = d.puntuacion || 0;
+    const tiempo = d.recomendacion || 'Sin datos';
+    const precio = d.precio || 0;
+
+    // Lógica de colores según el score
+    const colorClass = score > 70 ? 'dec-buy' : score > 40 ? 'dec-hold' : 'dec-sell';
     
     resCont.innerHTML = `
       <div class="dec ${colorClass}">
         <div class="dec-inner">
           <div class="dec-emoji">📊</div>
           <div>
-            <div class="dec-hl">Score: ${d.score}/100</div>
-            <div class="dec-sub">Sugerencia: ${d.tiempo}</div>
+            <div class="dec-hl">Score: ${score}/100</div>
+            <div class="dec-sub">Sugerencia: ${tiempo}</div>
           </div>
         </div>
         <div class="dec-foot">
-          <div class="dec-tag">PRECIO VIVO: $${d.precio}</div>
+          <div class="dec-tag">PRECIO VIVO: $${precio.toLocaleString('es-AR')}</div>
         </div>
       </div>
     `;
   } catch(e) {
-    resCont.innerHTML = '<div class="ia-resp">Error al conectar con Render.</div>';
+    // Si falla el server o Yahoo está bloqueado, sale el error acá
+    resCont.innerHTML = `<div class="ia-resp" style="color:var(--r)">Error: ${e.message}</div>`;
   }
 }
 </script>

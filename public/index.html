@@ -524,26 +524,28 @@ if ('serviceWorker' in navigator) {
 
 // ═══ NAV ════════════════════════════════════════════════
 async function ir(name, idx) {
-  // 1. Manejo de paneles existentes
+  // 1. Quitar 'on' de todos los paneles
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  
+  // 2. Si el panel existe físicamente (Hoy, Invertir, Cartera, etc.)
   const panelActual = document.getElementById('p-' + name);
   if (panelActual) panelActual.classList.add('on');
 
-  // 2. Manejo de botones de navegación
+  // 3. Marcar el botón del menú como activo
   document.querySelectorAll('.nb').forEach((b, i) => b.classList.toggle('on', i === idx));
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // 3. LÓGICA NUEVA PARA DATOS EN VIVO
-  // Si tocamos un botón que no tiene un panel físico en el HTML, usamos un panel genérico
-  if (name === 'dolar' || name === 'cedears' || name === 'simulador') {
-    // Usamos el panel de 'Invertir' como contenedor temporal para mostrar estos datos
+  // 4. LÓGICA PARA LOS BOTONES NUEVOS (Dólar y Cedears)
+  if (name === 'dolar' || name === 'cedears') {
+    // Usamos el panel 'p-inv' como contenedor para no tener que crear paneles nuevos
     const cont = document.getElementById('p-inv');
     cont.classList.add('on');
     
     if (name === 'dolar') {
-      cont.innerHTML = `<div class="sh">Dólar en tiempo real</div>
-                        <div class="card" id="lista-dolares" style="padding:10px">Cargando datos vivos...</div>
-                        <button class="btn btn-s" onclick="location.reload()" style="margin:10px; width:calc(100% - 20px)">← Volver</button>`;
+      cont.innerHTML = `
+        <div class="sh">Dólar en vivo (Argentina)</div>
+        <div class="card" id="lista-dolares" style="padding:10px">${ld()}</div>
+        <button class="btn btn-s" onclick="location.reload()" style="margin:10px; width:calc(100% - 20px)">← Volver</button>`;
       
       try {
         const res = await fetch(`${S.srv}/cotizaciones-completas`);
@@ -552,23 +554,23 @@ async function ir(name, idx) {
         data.forEach(d => {
           const esNaranja = d.nombre.toLowerCase().includes('tarjeta'); 
           html += `<div class="ni" style="${esNaranja ? 'background:var(--gs);border:1px solid var(--g);border-radius:12px;margin-bottom:8px' : ''}">
-              <div class="ni-src">${d.nombre} ${esNaranja ? '⭐ MEJOR PRECIO' : ''}</div>
+              <div class="ni-src">${d.nombre} ${esNaranja ? '⭐ MEJOR OPCIÓN' : ''}</div>
               <div class="ni-title">Venta: $${d.venta}</div>
           </div>`;
         });
         document.getElementById('lista-dolares').innerHTML = html;
       } catch(e) {
-        document.getElementById('lista-dolares').innerHTML = '<div class="ia-resp">Error al conectar con el servidor Render.</div>';
+        document.getElementById('lista-dolares').innerHTML = '<div class="ia-resp">Error: Asegurate de que Render esté activo.</div>';
       }
     }
 
     if (name === 'cedears') {
       cont.innerHTML = `
-        <div class="sh">Buscador de Oportunidades</div>
+        <div class="sh">Analizador Score 0-100</div>
         <div class="card" style="padding:20px">
           <label class="lbl">Ticker del Cedear</label>
           <input class="inp" id="in-cedear" placeholder="Ej: AAPL">
-          <button class="btn btn-g" style="margin-top:10px" onclick="analizarVivo()">Analizar Score 0-100</button>
+          <button class="btn btn-g" style="margin-top:10px" onclick="analizarVivo()">Analizar Ahora</button>
           <div id="res-cedear" style="margin-top:20px"></div>
         </div>
         <button class="btn btn-s" onclick="location.reload()" style="margin:0 16px; width:calc(100% - 32px)">← Volver</button>`;
@@ -1111,6 +1113,38 @@ if(!S.key) {
 mkDecision(); mkWA(); mkNews(); mkRecs(); mkAlertas(); // async - run in parallel
 if(S.port.length) renderCartera();
 if(S.tok){ setIOL(true); cargarIOL(); }
+
+  async function analizarVivo() {
+  const t = document.getElementById('in-cedear').value.toUpperCase();
+  if(!t) return;
+  
+  const resCont = document.getElementById('res-cedear');
+  resCont.innerHTML = ld();
+  
+  try {
+    const res = await fetch(`${S.srv}/analizar-cedear?ticker=${t}`);
+    const d = await res.json();
+    
+    const colorClass = d.score > 70 ? 'dec-buy' : d.score > 40 ? 'dec-hold' : 'dec-sell';
+    
+    resCont.innerHTML = `
+      <div class="dec ${colorClass}">
+        <div class="dec-inner">
+          <div class="dec-emoji">📊</div>
+          <div>
+            <div class="dec-hl">Score: ${d.score}/100</div>
+            <div class="dec-sub">Sugerencia: ${d.tiempo}</div>
+          </div>
+        </div>
+        <div class="dec-foot">
+          <div class="dec-tag">PRECIO VIVO: $${d.precio}</div>
+        </div>
+      </div>
+    `;
+  } catch(e) {
+    resCont.innerHTML = '<div class="ia-resp">Error al conectar con Render.</div>';
+  }
+}
 </script>
 </body>
 </html>

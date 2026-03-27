@@ -390,6 +390,37 @@ http.createServer(async (req, res) => {
     try{const data=await fetchDolar();return jsonResp(res,200,{ok:true,dolar:data});}
     catch(e){return jsonResp(res,500,{error:e.message});}
   }
+  // --- NUEVA RUTA: Análisis de CEDEAR en tiempo real ---
+  if (req.method === 'GET' && pathname === '/analizar-cedear') {
+    try {
+      const ticker = query.ticker || 'AAPL';
+      // Aquí el servidor llama a la lógica de mercado que ya tenés para traer el precio real
+      const data = await fetchMercado(); 
+      const info = data.find(c => c.symbol === ticker) || { last: 0, change: 0 };
+      
+      // Lógica de Score real: Basada en el cambio porcentual y posición de mercado
+      let score = 50 + (info.change || 0) * 2; 
+      if (info.change < -3) score += 20; // Si cayó mucho, es oportunidad (Buy the dip)
+      
+      const tiempo = score > 65 ? "6 a 12 meses" : "1 a 3 meses";
+      
+      return jsonResp(res, 200, {
+        ticker,
+        score: Math.min(100, Math.max(0, Math.round(score))),
+        recomendacion: tiempo,
+        precio: info.last
+      });
+    } catch(e) { return jsonResp(res, 500, {error: e.message}); }
+  }
+
+  // --- NUEVA RUTA: Dólares de todas las casas (incluye Naranja X) ---
+  if (req.method === 'GET' && pathname === '/cotizaciones-completas') {
+    try {
+      const r = await fetch('https://dolarapi.com/v1/cotizaciones');
+      const d = await r.json();
+      return jsonResp(res, 200, d);
+    } catch(e) { return jsonResp(res, 500, {error: e.message}); }
+  }
   if (req.method === 'GET' && pathname === '/mercado') {
     try{const data=await fetchMercado();return jsonResp(res,200,{ok:true,cedears:data});}
     catch(e){return jsonResp(res,500,{error:e.message});}

@@ -255,29 +255,27 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);min-height:100
 .hist-sl{font-size:9px;font-family:var(--mono);color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
 .hist-sv{font-size:13px;font-weight:700;}
 
-/* ── Dólar ── */
+/* ── Dólar cards ── */
 .dol-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
-.dol-card{background:var(--c1);border:1px solid var(--ln);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;transition:border-color .2s;}
-.dol-card.best{border-color:var(--gb);background:linear-gradient(135deg,rgba(0,230,118,.06),transparent);}
+.dol-card{background:var(--c1);border:1px solid var(--ln);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;}
+.dol-card.best{border-color:var(--gb);background:linear-gradient(135deg,rgba(0,230,118,.07),transparent);}
 .dol-name{font-size:10px;font-family:var(--mono);color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
-.dol-val{font-size:21px;font-weight:800;letter-spacing:-.5px;color:var(--tx);}
+.dol-val{font-size:20px;font-weight:800;letter-spacing:-.5px;}
 .dol-sub{font-size:10px;color:var(--t2);font-family:var(--mono);margin-top:2px;}
 .dol-badge{position:absolute;top:8px;right:8px;font-size:9px;background:var(--gs);color:var(--g);border:1px solid var(--gb);padding:2px 6px;border-radius:5px;font-family:var(--mono);font-weight:700;}
-/* ── Cedears ── */
-.sec-bar{display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-.sec-bar::-webkit-scrollbar{display:none;}
-.sec-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--ln);background:var(--c1);color:var(--t2);font-size:11px;font-family:var(--font);font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
-.sec-btn.on{background:var(--bs);color:var(--b);border-color:var(--bb);}
+/* ── Cedear list ── */
 .ced-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--ln);}
 .ced-item:last-child{border-bottom:none;}
 .ced-l{display:flex;align-items:center;gap:10px;}
 .ced-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:var(--mono);flex-shrink:0;}
 .ced-sym{font-size:14px;font-weight:800;}
-.ced-nm{font-size:10px;color:var(--t2);margin-top:1px;}
+.ced-nm{font-size:10px;color:var(--t2);}
 .ced-info{font-size:9px;color:var(--t2);font-family:var(--mono);margin-top:2px;}
 .ced-r{text-align:right;flex-shrink:0;}
 .ced-price{font-family:var(--mono);font-size:13px;font-weight:700;}
 .ced-chg{font-family:var(--mono);font-size:11px;font-weight:700;}
+.sec-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--ln);background:var(--c1);color:var(--t2);font-size:11px;font-family:var(--font);font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.sec-btn.on{background:var(--bs);color:var(--b);border-color:var(--bb);}
 </style>
 </head>
 <body>
@@ -438,9 +436,9 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);min-height:100
     <div style="margin:0 16px 10px;padding:16px 18px;background:var(--c1);border:1px solid var(--ln);border-radius:18px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
         <div style="width:34px;height:34px;border-radius:9px;background:var(--ps);border:1px solid var(--pb);display:flex;align-items:center;justify-content:center;font-size:16px">🔑</div>
-        <div><div style="font-weight:700;font-size:13px">API Key de Groq</div><div style="font-size:11px;color:var(--t2)">Para el análisis IA · console.groq.com · 100% gratis · sin límite</div></div>
+        <div><div style="font-weight:700;font-size:13px">API Key de Gemini</div><div style="font-size:11px;color:var(--t2)">Para el análisis IA · aistudio.google.com/apikey · Gratis</div></div>
       </div>
-      <input class="inp" id="key-inp" type="password" placeholder="gsk_..."/>
+      <input class="inp" id="key-inp" type="password" placeholder="AIzaSy..."/>
       <button class="btn btn-g" style="margin-top:10px" onclick="guardarKey()">Guardar</button>
       <div id="key-ok" style="display:none;margin-top:8px;font-size:11px;color:var(--g);font-family:var(--mono)">✓ API Key guardada</div>
     </div>
@@ -502,7 +500,10 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);min-height:100
   <div class="panel" id="p-dolar">
     <div class="sh" style="padding-top:16px">Cotizaciones del dólar hoy</div>
     <div style="margin:0 16px 10px" id="dolar-cards">
-      <div style="padding:24px;text-align:center;color:var(--t2)"><div class="dots"><i></i><i></i><i></i></div><div style="margin-top:8px;font-size:12px">Cargando cotizaciones...</div></div>
+      <div style="padding:24px;text-align:center;color:var(--t2)">
+        <div class="dots"><i></i><i></i><i></i></div>
+        <div style="margin-top:8px;font-size:12px">Cargando cotizaciones...</div>
+      </div>
     </div>
     <div id="dolar-mejor-wrap" style="display:none;margin:0 16px 10px">
       <div style="background:var(--gs);border:1px solid var(--gb);border-radius:14px;padding:14px 16px">
@@ -512,7 +513,9 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);min-height:100
     </div>
     <div class="sh">Evolución dólar blue</div>
     <div style="margin:0 16px 16px;background:var(--c1);border:1px solid var(--ln);border-radius:14px;padding:16px">
-      <div id="dolar-hist-wrap"><div style="text-align:center;font-size:12px;color:var(--t2)">El gráfico aparece después de 2 días de uso.</div></div>
+      <div id="dolar-hist-wrap">
+        <div style="text-align:center;font-size:12px;color:var(--t2);padding:8px">El gráfico aparece después de 2 días de uso.</div>
+      </div>
     </div>
   </div>
 
@@ -522,9 +525,12 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);min-height:100
       <label class="lbl">Buscar cedear</label>
       <input class="inp" id="cedear-search" placeholder="AAPL, Tesla, tecnología..." oninput="filtrarCedears()"/>
     </div>
-    <div class="sec-bar" id="sector-bar"></div>
+    <div style="display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none" id="sector-bar"></div>
     <div style="margin:0 16px 16px" id="cedears-list">
-      <div style="padding:24px;text-align:center;color:var(--t2)"><div class="dots"><i></i><i></i><i></i></div><div style="margin-top:8px;font-size:12px">Cargando cedears...</div></div>
+      <div style="padding:24px;text-align:center;color:var(--t2)">
+        <div class="dots"><i></i><i></i><i></i></div>
+        <div style="margin-top:8px;font-size:12px">Cargando cedears...</div>
+      </div>
     </div>
   </div>
 
@@ -554,7 +560,7 @@ const S = {
   news: [],
   dolar: null,
 };
-const GROQ = 'https://api.groq.com/openai/v1/chat/completions';
+const GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 function server() { return S.srv || 'https://lf-m7nn.onrender.com'; }
 
 // ═══ PWA ════════════════════════════════════════════════
@@ -579,36 +585,35 @@ if ('serviceWorker' in navigator) {
 
 // ═══ NAV ════════════════════════════════════════════════
 function ir(name, idx) {
+  // 1. Quitar 'on' de todos los paneles
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
-  const panel = document.getElementById('p-' + name);
-  if (panel) panel.classList.add('on');
+  
+  // 2. Si el panel existe físicamente (Hoy, Invertir, Cartera, etc.)
+  const panelActual = document.getElementById('p-' + name);
+  if (panelActual) panelActual.classList.add('on');
+
+  // 3. Marcar el botón del menú como activo
   document.querySelectorAll('.nb').forEach((b, i) => b.classList.toggle('on', i === idx));
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  if (name === 'dolar')   mkDolar();
-  if (name === 'cedears') mkCedears();
+
+  if (name === 'dolar')   setTimeout(mkDolar, 50);
+  if (name === 'cedears') setTimeout(mkCedears, 50);
 }
-
-// ── dummy old ir block removal below ──
-if (false) {
-}
-
-
 
 // ═══ CLAUDE ═════════════════════════════════════════════
 async function ai(sys, usr, max = 900) {
-  if (!S.key) throw new Error('Configurá tu API Key de Groq en Ajustes ⚙️');
-  const r = await fetch(GROQ, {
+  if (!S.key) throw new Error('Configurá tu API Key de Gemini en Ajustes ⚙️');
+  const r = await fetch(GEMINI + '?key=' + S.key, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + S.key },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: [{ role: 'system', content: sys }, { role: 'user', content: usr }],
-      max_tokens: max, temperature: 0.7
+      contents: [{ parts: [{ text: sys + '\n\n' + usr }] }],
+      generationConfig: { maxOutputTokens: max, temperature: 0.7 }
     })
   });
   const d = await r.json();
-  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
-  return d.choices?.[0]?.message?.content || '';
+  if (d.error) throw new Error(d.error.message);
+  return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
 const md = t => t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
 const ld = () => '<div class="dots"><i></i><i></i><i></i></div>';
@@ -1093,17 +1098,16 @@ async function traducirNoticias(noticias) {
 
   try {
     const titulos = enIngles.map((n, i) => `${i+1}. ${n.title}`).join('\n');
-    const r = await fetch(GROQ, {
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + S.key, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + S.key },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'user', content: `Traducí estos títulos de noticias financieras al español argentino. Devolvé SOLO los títulos traducidos numerados, sin explicaciones:\n${titulos}` }],
-        max_tokens: 500, temperature: 0.1
+        contents: [{ parts: [{ text: `Traducí estos títulos de noticias financieras al español argentino. Devolvé SOLO los títulos traducidos numerados, sin explicaciones:\n${titulos}` }] }],
+        generationConfig: { maxOutputTokens: 500, temperature: 0.1 }
       })
     });
     const d = await r.json();
-    const txt = d.choices?.[0]?.message?.content || '';
+    const txt = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const lineas = txt.split('\n').filter(l => /^\d+\./.test(l.trim()));
 
     if (lineas.length === enIngles.length) {
@@ -1123,32 +1127,37 @@ async function traducirNoticias(noticias) {
 
 // ═══ DÓLAR ═══════════════════════════════════════════════
 const DOLAR_INFO = {
-  oficial:         { nombre:'Oficial BNA',     color:'#3d7bff', desc:'Banco Nación · Solo $200/mes' },
-  blue:            { nombre:'Blue',            color:'#00e676', desc:'Mercado informal · Sin límite' },
-  bolsa:           { nombre:'MEP / Bolsa',     color:'#ffbe00', desc:'Compra via bonos · Sin límite' },
-  contadoconliqui: { nombre:'CCL',             color:'#b06cff', desc:'Transferencia exterior' },
-  cripto:          { nombre:'Cripto (USDT)',   color:'#ff6d3b', desc:'Stablecoins · Binance/Lemon' },
-  tarjeta:         { nombre:'Tarjeta',         color:'#ff3d6b', desc:'Compras en exterior +35%' },
+  oficial:         { nombre:'Oficial BNA',   color:'#3d7bff', desc:'Solo $200/mes' },
+  blue:            { nombre:'Blue',          color:'#00e676', desc:'Sin límite' },
+  bolsa:           { nombre:'MEP / Bolsa',   color:'#ffbe00', desc:'Via bonos' },
+  contadoconliqui: { nombre:'CCL',           color:'#b06cff', desc:'Exterior' },
+  cripto:          { nombre:'Cripto USDT',   color:'#ff6d3b', desc:'Binance/Lemon' },
+  tarjeta:         { nombre:'Tarjeta',       color:'#ff3d6b', desc:'+35% recargo' },
 };
-
-let histDolarChart = null;
+let histDolarChart2 = null;
 
 async function mkDolar() {
   const wrap = document.getElementById('dolar-cards');
   if (!wrap) return;
   try {
     const r = await fetch('https://dolarapi.com/v1/dolares');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     const tipos = await r.json();
 
-    // Guardar blue en histórico
     const blue = tipos.find(t => t.casa === 'blue');
-    if (blue?.venta) guardarHistDolar(blue.venta);
+    if (blue?.venta) {
+      const hoy = new Date().toLocaleDateString('es-AR');
+      let hist = JSON.parse(localStorage.getItem('lf_hist_dolar') || '[]');
+      if (!hist.find(h => h.fecha === hoy)) {
+        hist.push({ fecha: hoy, val: blue.venta });
+        if (hist.length > 30) hist = hist.slice(-30);
+        localStorage.setItem('lf_hist_dolar', JSON.stringify(hist));
+      }
+    }
 
-    // Encontrar más barato para comprar (excluye oficial)
     const comprables = tipos.filter(t => t.casa !== 'oficial' && t.venta);
     const mejor = comprables.sort((a,b) => a.venta - b.venta)[0];
 
-    // Render grid
     const cards = Object.entries(DOLAR_INFO).map(([casa, info]) => {
       const d = tipos.find(t => t.casa === casa);
       if (!d) return '';
@@ -1156,67 +1165,50 @@ async function mkDolar() {
       return `<div class="dol-card ${esMejor?'best':''}">
         ${esMejor ? '<div class="dol-badge">✓ MÁS BARATO</div>' : ''}
         <div class="dol-name">${info.nombre}</div>
-        <div class="dol-val">$${(d.venta||0).toLocaleString('es-AR')}</div>
-        <div class="dol-sub">Compra $${(d.compra||0).toLocaleString('es-AR')}</div>
-        <div class="dol-sub" style="margin-top:3px">${info.desc}</div>
+        <div class="dol-val" style="color:${info.color}">$${(d.venta||0).toLocaleString('es-AR')}</div>
+        <div class="dol-sub">Compra: $${(d.compra||0).toLocaleString('es-AR')}</div>
+        <div class="dol-sub">${info.desc}</div>
       </div>`;
     }).filter(Boolean).join('');
 
-    wrap.innerHTML = `<div class="dol-grid">${cards}</div>`;
+    wrap.innerHTML = '<div class="dol-grid">' + cards + '</div>';
 
-    // Mejor precio banner
     if (mejor) {
       const info = DOLAR_INFO[mejor.casa] || { nombre: mejor.casa };
       document.getElementById('dolar-mejor-txt').textContent =
-        `${info.nombre} a $${mejor.venta.toLocaleString('es-AR')} — el más barato para comprar hoy`;
+        info.nombre + ' a $' + mejor.venta.toLocaleString('es-AR') + ' — el más barato para comprar hoy';
       document.getElementById('dolar-mejor-wrap').style.display = 'block';
     }
 
-    renderHistDolar();
+    // Histórico gráfico
+    const histW = document.getElementById('dolar-hist-wrap');
+    const hist2 = JSON.parse(localStorage.getItem('lf_hist_dolar') || '[]');
+    if (hist2.length >= 2 && histW) {
+      histW.innerHTML = '<canvas id="dolar-canvas2" style="height:110px"></canvas>';
+      if (histDolarChart2) { histDolarChart2.destroy(); histDolarChart2 = null; }
+      setTimeout(() => {
+        const ctx = document.getElementById('dolar-canvas2'); if(!ctx) return;
+        histDolarChart2 = new Chart(ctx, {
+          type:'line',
+          data:{ labels:hist2.map(h=>h.fecha.slice(0,5)), datasets:[{
+            data:hist2.map(h=>h.val), borderColor:'#00e676', backgroundColor:'rgba(0,230,118,.08)',
+            borderWidth:2, pointRadius:2, tension:.4, fill:true
+          }]},
+          options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+            scales:{ x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6878a8',font:{size:9},maxTicksLimit:6}},
+                     y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6878a8',font:{size:9},callback:v=>'$'+v.toLocaleString('es-AR')}} }}
+        });
+      }, 80);
+    }
   } catch(e) {
-    wrap.innerHTML = `<div style="padding:20px;text-align:center;color:var(--t2);font-size:13px">No se pudo cargar. Verificá tu conexión.</div>`;
+    const w = document.getElementById('dolar-cards');
+    if (w) w.innerHTML = '<div style="padding:20px;text-align:center;color:var(--r);font-size:13px">Error: ' + e.message + '</div>';
   }
-}
-
-function guardarHistDolar(blue) {
-  if (!blue) return;
-  const hoy = new Date().toLocaleDateString('es-AR');
-  let hist = JSON.parse(localStorage.getItem('lf_hist_dolar') || '[]');
-  if (!hist.find(h => h.fecha === hoy)) {
-    hist.push({ fecha: hoy, val: blue });
-    if (hist.length > 30) hist = hist.slice(-30);
-    localStorage.setItem('lf_hist_dolar', JSON.stringify(hist));
-  }
-}
-
-function renderHistDolar() {
-  const wrap = document.getElementById('dolar-hist-wrap');
-  if (!wrap) return;
-  const hist = JSON.parse(localStorage.getItem('lf_hist_dolar') || '[]');
-  if (hist.length < 2) {
-    wrap.innerHTML = '<div style="text-align:center;font-size:12px;color:var(--t2);padding:10px">El gráfico aparece después de 2 días.</div>';
-    return;
-  }
-  wrap.innerHTML = '<canvas id="dolar-canvas" style="height:110px"></canvas>';
-  if (histDolarChart) { histDolarChart.destroy(); histDolarChart = null; }
-  setTimeout(() => {
-    const ctx = document.getElementById('dolar-canvas'); if(!ctx) return;
-    histDolarChart = new Chart(ctx, {
-      type: 'line',
-      data: { labels: hist.map(h=>h.fecha.slice(0,5)), datasets:[{
-        data: hist.map(h=>h.val), borderColor:'#00e676', backgroundColor:'rgba(0,230,118,.08)',
-        borderWidth:2, pointRadius:2, tension:.4, fill:true
-      }]},
-      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-        scales:{ x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6878a8',font:{size:9},maxTicksLimit:6}},
-                 y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#6878a8',font:{size:9},callback:v=>'$'+v.toLocaleString('es-AR')}} } }
-    });
-  }, 80);
 }
 
 // ═══ CEDEARS ═════════════════════════════════════════════
-const TODOS_CEDEARS = [
-  {ticker:'AAPL', name:'Apple',          sector:'Tecnología',     color:'#555555'},
+const TODOS_CEDEARS2 = [
+  {ticker:'AAPL', name:'Apple',          sector:'Tecnología',     color:'#888888'},
   {ticker:'MSFT', name:'Microsoft',      sector:'Tecnología',     color:'#00a4ef'},
   {ticker:'GOOGL',name:'Alphabet',       sector:'Tecnología',     color:'#4285f4'},
   {ticker:'META', name:'Meta',           sector:'Tecnología',     color:'#0082fb'},
@@ -1237,114 +1229,115 @@ const TODOS_CEDEARS = [
   {ticker:'XOM',  name:'ExxonMobil',     sector:'Energía',        color:'#ff0000'},
   {ticker:'CVX',  name:'Chevron',        sector:'Energía',        color:'#0072ce'},
   {ticker:'PFE',  name:'Pfizer',         sector:'Salud',          color:'#0093d0'},
-  {ticker:'JNJ',  name:'Johnson & J',    sector:'Salud',          color:'#cc0000'},
+  {ticker:'JNJ',  name:'J&J',            sector:'Salud',          color:'#cc0000'},
   {ticker:'KO',   name:'Coca-Cola',      sector:'Consumo',        color:'#f40000'},
   {ticker:'MCD',  name:"McDonald's",     sector:'Consumo',        color:'#da291c'},
   {ticker:'WMT',  name:'Walmart',        sector:'Consumo',        color:'#0071dc'},
-  {ticker:'UBER', name:'Uber',           sector:'Tecnología',     color:'#1c1c1c'},
+  {ticker:'UBER', name:'Uber',           sector:'Tecnología',     color:'#333333'},
   {ticker:'CRM',  name:'Salesforce',     sector:'Tecnología',     color:'#00a1e0'},
   {ticker:'PYPL', name:'PayPal',         sector:'Fintech',        color:'#003087'},
   {ticker:'BA',   name:'Boeing',         sector:'Industria',      color:'#1b6ca8'},
   {ticker:'ZM',   name:'Zoom',           sector:'Tecnología',     color:'#2d8cff'},
 ];
-
-let cedearsData = [], cedearsFiltered = [], sectorActivo = 'Todos';
+let cedearsData2 = [], cedearsFiltered2 = [], sectorActivo2 = 'Todos', cedearsLoaded = false;
 
 async function mkCedears() {
-  try {
-    const r = await fetch('https://lf-m7nn.onrender.com/mercado');
-    const d = await r.json();
-    if (d.ok && d.cedears?.length) {
-      cedearsData = TODOS_CEDEARS.map(c => {
-        const q = d.cedears.find(x => x.ticker === c.ticker) || {};
-        return { ...c, price: q.price||0, chg: q.change||0, pe: q.pe||0, score: q.score||50,
-                 high52: q.high52||0, low52: q.low52||0, ma50: q.ma50||0, ma200: q.ma200||0 };
-      });
-    } else throw new Error('sin datos');
-  } catch(e) {
-    cedearsData = TODOS_CEDEARS.map(c => ({ ...c, price:0, chg:0, pe:0, score:50 }));
+  if (!cedearsLoaded) {
+    try {
+      const r = await fetch('https://lf-m7nn.onrender.com/mercado');
+      const d = await r.json();
+      if (d.ok && d.cedears?.length) {
+        cedearsData2 = TODOS_CEDEARS2.map(c => {
+          const q = d.cedears.find(x => x.ticker === c.ticker) || {};
+          return { ...c, price:q.price||0, chg:q.change||0, pe:q.pe||0, score:q.score||50 };
+        });
+        cedearsLoaded = true;
+      } else throw new Error('sin datos');
+    } catch(e) {
+      cedearsData2 = TODOS_CEDEARS2.map(c => ({ ...c, price:0, chg:0, pe:0, score:50 }));
+    }
   }
 
-  const sectores = ['Todos', ...new Set(TODOS_CEDEARS.map(c => c.sector))];
-  document.getElementById('sector-bar').innerHTML = sectores.map(s =>
-    `<button class="sec-btn ${s===sectorActivo?'on':''}" onclick="setSector('${s}')">${s}</button>`
+  const sectores = ['Todos', ...new Set(TODOS_CEDEARS2.map(c => c.sector))];
+  const sbar = document.getElementById('sector-bar');
+  if (sbar) sbar.innerHTML = sectores.map(s =>
+    '<button class="sec-btn ' + (s===sectorActivo2?'on':'') + '" onclick="setSector2('' + s + '')">' + s + '</button>'
   ).join('');
 
-  cedearsFiltered = [...cedearsData].sort((a,b) => b.score - a.score);
-  renderCedears();
+  cedearsFiltered2 = [...cedearsData2].sort((a,b) => b.score - a.score);
+  renderCedears2();
 }
 
-function setSector(s) {
-  sectorActivo = s;
+function setSector2(s) {
+  sectorActivo2 = s;
   document.querySelectorAll('.sec-btn').forEach(b => b.classList.toggle('on', b.textContent === s));
   filtrarCedears();
 }
 
 function filtrarCedears() {
   const q = (document.getElementById('cedear-search')?.value || '').toLowerCase();
-  cedearsFiltered = cedearsData.filter(c => {
-    const ms = sectorActivo === 'Todos' || c.sector === sectorActivo;
+  cedearsFiltered2 = cedearsData2.filter(c => {
+    const ms = sectorActivo2 === 'Todos' || c.sector === sectorActivo2;
     const mq = !q || c.ticker.toLowerCase().includes(q) || c.name.toLowerCase().includes(q) || c.sector.toLowerCase().includes(q);
     return ms && mq;
   }).sort((a,b) => b.score - a.score);
-  renderCedears();
+  renderCedears2();
 }
 
-function scColor(s){ return s>=70?'var(--g)':s>=50?'var(--y)':'var(--r)'; }
-function scLabel(s){
-  if(s>=80) return '🔥 Muy buena oportunidad';
-  if(s>=70) return '✅ Buena entrada hoy';
-  if(s>=58) return '⏳ Momento neutral';
-  if(s>=45) return '⚠️ Señales mixtas';
-  return '🔴 Evitar por ahora';
+function scColor2(s){ return s>=70?'var(--g)':s>=50?'var(--y)':'var(--r)'; }
+function scLabel2(s){
+  if(s>=80) return '🔥 Muy buena';
+  if(s>=70) return '✅ Buena entrada';
+  if(s>=58) return '⏳ Neutral';
+  if(s>=45) return '⚠️ Cautela';
+  return '🔴 Evitar';
 }
 
-function renderCedears() {
+function renderCedears2() {
   const list = document.getElementById('cedears-list');
   if (!list) return;
-  if (!cedearsFiltered.length) { list.innerHTML='<div style="padding:20px;text-align:center;color:var(--t2)">Sin resultados</div>'; return; }
-  list.innerHTML = `<div style="background:var(--c1);border:1px solid var(--ln);border-radius:14px;padding:0 16px">` +
-    cedearsFiltered.map(c => {
+  if (!cedearsFiltered2.length) { list.innerHTML='<div style="padding:20px;text-align:center;color:var(--t2)">Sin resultados</div>'; return; }
+  list.innerHTML = '<div style="background:var(--c1);border:1px solid var(--ln);border-radius:14px;padding:0 16px">' +
+    cedearsFiltered2.map(c => {
       const cc=(c.chg||0)>=0?'var(--g)':'var(--r)', sign=(c.chg||0)>=0?'+':'';
-      const sc=scColor(c.score), sl=scLabel(c.score);
+      const sc=scColor2(c.score), sl=scLabel2(c.score);
       const price=c.price||0;
       const target=price?'$'+(price*1.10).toFixed(2):'–';
       const stop  =price?'$'+(price*0.92).toFixed(2):'–';
       const ten=(c.score>=72)?'1-3 sem':(c.score>=58)?'1-2 meses':'Revisar';
       const pe=c.pe>0?c.pe.toFixed(1):'–';
-      return `<div class="ced-item">
-        <div class="ced-l">
-          <div class="ced-ico" style="background:${c.color}33;border:1px solid ${c.color}55;color:${c.color}">${c.ticker.slice(0,2)}</div>
-          <div>
-            <div class="ced-sym">${c.ticker} <span style="font-size:10px;color:var(--t2);font-weight:400">${c.sector}</span></div>
-            <div class="ced-nm">${c.name}</div>
-            <div class="ced-info">🎯${target} · 🛑${stop} · ⏱${ten} · P/E ${pe}</div>
-          </div>
-        </div>
-        <div class="ced-r">
-          <div class="ced-price">${price?'$'+price.toFixed(2):'–'}</div>
-          <div class="ced-chg" style="color:${cc}">${sign}${(c.chg||0).toFixed(1)}%</div>
-          <div style="display:flex;align-items:center;gap:3px;margin-top:3px;justify-content:flex-end">
-            <div style="width:32px;height:3px;background:var(--c3);border-radius:2px;overflow:hidden">
-              <div style="height:3px;width:${c.score}%;background:${sc};border-radius:2px"></div>
-            </div>
-            <span style="font-size:10px;font-family:var(--mono);color:${sc};font-weight:700">${c.score}</span>
-          </div>
-          <div style="font-size:9px;color:${sc};margin-top:2px;white-space:nowrap">${sl.split(' ')[0]}</div>
-        </div>
-      </div>`;
+      return '<div class="ced-item">' +
+        '<div class="ced-l">' +
+          '<div class="ced-ico" style="background:' + c.color + '33;border:1px solid ' + c.color + '55;color:' + c.color + '">' + c.ticker.slice(0,2) + '</div>' +
+          '<div>' +
+            '<div class="ced-sym">' + c.ticker + ' <span style="font-size:10px;color:var(--t2);font-weight:400">' + c.sector + '</span></div>' +
+            '<div class="ced-nm">' + c.name + ' · ' + sl + '</div>' +
+            '<div class="ced-info">🎯' + target + ' · 🛑' + stop + ' · ⏱' + ten + ' · P/E ' + pe + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ced-r">' +
+          '<div class="ced-price">' + (price?'$'+price.toFixed(2):'–') + '</div>' +
+          '<div class="ced-chg" style="color:' + cc + '">' + sign + (c.chg||0).toFixed(1) + '%</div>' +
+          '<div style="display:flex;align-items:center;gap:3px;margin-top:3px;justify-content:flex-end">' +
+            '<div style="width:32px;height:3px;background:var(--c3);border-radius:2px;overflow:hidden">' +
+              '<div style="height:3px;width:' + c.score + '%;background:' + sc + ';border-radius:2px"></div>' +
+            '</div>' +
+            '<span style="font-size:10px;font-family:var(--mono);color:' + sc + ';font-weight:700">' + c.score + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
     }).join('') + '</div>';
 }
 
 // ═══ INIT ═══════════════════════════════════════════════
 if(!S.key) {
   setTimeout(()=>{
-    const k=prompt('Bienvenido a LF 👋\n\nIngresá tu API Key de Groq para el análisis IA.\n→ console.groq.com → API Keys\n\nDejá vacío para saltear.');
+    const k=prompt('Bienvenido a LF 👋\n\nIngresá tu API Key de Gemini para el análisis IA.\n→ console.anthropic.com → API Keys\n\nDejá vacío para saltear.');
     if(k?.trim()){ S.key=k.trim(); localStorage.setItem('lf_k',S.key); document.getElementById('key-inp').value=S.key; }
   }, 500);
 }
 
-mkDecision(); mkWA(); mkNews(); mkRecs(); mkAlertas();
+mkDecision(); mkWA(); mkNews(); mkRecs(); mkAlertas(); // async - run in parallel
 if(S.port.length) renderCartera();
 if(S.tok){ setIOL(true); cargarIOL(); }
 

@@ -390,35 +390,30 @@ http.createServer(async (req, res) => {
     try{const data=await fetchDolar();return jsonResp(res,200,{ok:true,dolar:data});}
     catch(e){return jsonResp(res,500,{error:e.message});}
   }
-  // --- NUEVA RUTA: Análisis de CEDEAR en tiempo real ---
+  // Análisis de cedear individual
   if (req.method === 'GET' && pathname === '/analizar-cedear') {
     try {
-      const ticker = query.ticker || 'AAPL';
-      // Aquí el servidor llama a la lógica de mercado que ya tenés para traer el precio real
-      const data = await fetchMercado(); 
-      const info = data.find(c => c.symbol === ticker) || { last: 0, change: 0 };
-      
-      // Lógica de Score real: Basada en el cambio porcentual y posición de mercado
-      let score = 50 + (info.change || 0) * 2; 
-      if (info.change < -3) score += 20; // Si cayó mucho, es oportunidad (Buy the dip)
-      
-      const tiempo = score > 65 ? "6 a 12 meses" : "1 a 3 meses";
-      
+      const qs = new URLSearchParams(req.url.split('?')[1] || '');
+      const ticker = (qs.get('ticker') || 'AAPL').toUpperCase();
+      const data = await fetchMercado();
+      const info = data.find(c => c.ticker === ticker);
+      if (!info) return jsonResp(res, 404, { error: 'Cedear no encontrado' });
+      const ten = info.score >= 72 ? '1-3 semanas' : info.score >= 58 ? '1-2 meses' : 'Revisar posición';
       return jsonResp(res, 200, {
-        ticker,
-        score: Math.min(100, Math.max(0, Math.round(score))),
-        recomendacion: tiempo,
-        precio: info.last
+        ticker, score: info.score, price: info.price, change: info.change,
+        pe: info.pe, recomendacion: ten,
+        target: info.price ? (info.price * 1.10).toFixed(2) : null,
+        stop:   info.price ? (info.price * 0.92).toFixed(2) : null,
       });
     } catch(e) { return jsonResp(res, 500, {error: e.message}); }
   }
 
-  // --- NUEVA RUTA: Dólares de todas las casas (incluye Naranja X) ---
+  // Dólares de todas las casas
   if (req.method === 'GET' && pathname === '/cotizaciones-completas') {
     try {
-      const r = await fetch('https://dolarapi.com/v1/cotizaciones');
-      const d = await r.json();
-      return jsonResp(res, 200, d);
+      const r = await httpGet('https://dolarapi.com/v1/dolares');
+      const d = JSON.parse(r.b);
+      return jsonResp(res, 200, { ok: true, dolares: d });
     } catch(e) { return jsonResp(res, 500, {error: e.message}); }
   }
   if (req.method === 'GET' && pathname === '/mercado') {
@@ -440,5 +435,5 @@ http.createServer(async (req, res) => {
   console.log(`LF Server → puerto ${E.PORT}`);
   console.log(`WhatsApp: ${waOk()?'✅':'⚠️  sin configurar'}`);
   console.log(`Resumen diario: ${E.HORA}:00hs`);
-  console.log(`Endpoints: /noticias /dolar /mercado /portafolio /login`);
+  console.log(`Endpoints: /noticias /dolar /mercado /portafolio /login /cotizaciones-completas /analizar-cedear`);
 });

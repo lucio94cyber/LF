@@ -1,4 +1,4 @@
-const CACHE = 'lf-v1';
+const CACHE = 'lf-v4';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -14,8 +14,11 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // For API calls — network only
-  if (e.request.url.includes('/api/') || e.request.url.includes('anthropic') || e.request.url.includes('invertironline')) {
+  if (e.request.url.includes('/api/') || 
+      e.request.url.includes('groq') ||
+      e.request.url.includes('invertironline') ||
+      e.request.url.includes('onrender.com') ||
+      e.request.url.includes('dolarapi')) {
     return;
   }
   e.respondWith(

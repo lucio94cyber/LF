@@ -62,7 +62,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);min-height:100
   width:100%;max-width:430px;
   background:rgba(13,17,32,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-top:1px solid var(--ln);
-  display:grid;grid-template-columns:repeat(5,1fr);
+  display:grid;grid-template-columns:repeat(6,1fr);
   padding:6px 0 calc(6px + var(--safe-bot));
   z-index:50;
 }
@@ -487,7 +487,7 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);min-height:100
 </div><!-- /shell -->
 
 <!-- BOTTOM NAV -->
-<nav class="nav" style="grid-template-columns:repeat(6,1fr)">
+<nav class="nav">
   <button class="nb on" onclick="ir('hoy',0)"><span class="ic">☀️</span><span class="lb">HOY</span></button>
   <button class="nb"    onclick="ir('inv',1)"><span class="ic">🎯</span><span class="lb">INVERTIR</span></button>
   <button class="nb"    onclick="ir('dolar',2)"><span class="ic">💵</span><span class="lb">DÓLAR</span></button>
@@ -687,31 +687,30 @@ async function mkNews() {
   const card = document.getElementById('news-card');
   card.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t2)"><div class=\"dots\"><i></i><i></i><i></i></div><div style=\"margin-top:8px;font-size:12px\">Cargando noticias en tiempo real...</div></div>';
 
-  // Cargar noticias del servidor
+  // Intentar cargar del servidor
   let noticias = NEWS_FALLBACK;
-  const srvUrl = S.srv || 'https://lf-m7nn.onrender.com';
-  try {
-    const r = await fetch(srvUrl + '/noticias');
-    const d = await r.json();
-    if (d.ok && d.noticias?.length) noticias = d.noticias;
-  } catch(e) { console.log('Noticias fallback:', e.message); }
+  if (S.srv) {
+    try {
+      const r = await fetch(S.srv + '/noticias');
+      const d = await r.json();
+      if (d.ok && d.noticias?.length) noticias = d.noticias;
+    } catch(e) { console.log('Noticias fallback:', e.message); }
+  }
 
   // Cargar dólar blue
-  try {
-    const r2 = await fetch('https://dolarapi.com/v1/dolares');
-    const tipos = await r2.json();
-    const blue = tipos.find(t => t.casa === 'blue');
-    const mep  = tipos.find(t => t.casa === 'bolsa');
-    const ccl  = tipos.find(t => t.casa === 'contadoconliqui');
-    if (blue?.venta) {
-      S.dolar = { blue: blue.venta, mep: mep?.venta, ccl: ccl?.venta };
-      noticias.unshift({
-        src:'Dólar Hoy', 
-        title:'💵 Blue: $' + blue.venta.toLocaleString('es-AR') + ' | MEP: $' + (mep?.venta||'–').toLocaleString?.('es-AR') + ' | CCL: $' + (ccl?.venta||'–').toLocaleString?.('es-AR'),
-        time:'Ahora', tk:'ARG', imp:'neutral'
-      });
-    }
-  } catch(e) { console.log('Dólar directo fallback:', e.message); }
+  if (S.srv) {
+    try {
+      const r = await fetch(S.srv + '/dolar');
+      const d = await r.json();
+      if (d.ok && d.dolar) {
+        S.dolar = d.dolar;
+        // Agregar noticia del dólar si hay datos
+        if (d.dolar.blue) {
+          noticias.unshift({ src:'Dólar API', title:`💵 Dólar blue: $${d.dolar.blue.toLocaleString('es-AR')} | MEP: $${d.dolar.mep?.toLocaleString('es-AR')||'–'} | CCL: $${d.dolar.ccl?.toLocaleString('es-AR')||'–'}`, time:'Ahora', tk:'ARG', imp:'neutral' });
+        }
+      }
+    } catch(e) { console.log('Dólar fallback:', e.message); }
+  }
 
   // Traducir noticias en inglés
   noticias = await traducirNoticias(noticias);
@@ -1103,6 +1102,7 @@ async function traducirNoticias(noticias) {
     const titulos = enIngles.map((n, i) => `${i+1}. ${n.title}`).join('\n');
     const r = await fetch(GROQ, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + S.key },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
@@ -1265,7 +1265,7 @@ async function mkCedears() {
   const sectores = ['Todos', ...new Set(TODOS_CEDEARS2.map(c => c.sector))];
   const sbar = document.getElementById('sector-bar');
   if (sbar) sbar.innerHTML = sectores.map(s =>
-    '<button class="sec-btn ' + (s===sectorActivo2?'on':'') + '" onclick="setSector2('' + s + '')">' + s + '</button>'
+    '<button class="sec-btn ' + (s===sectorActivo2?'on':'') + '" onclick="setSector2('" + s + "')">' + s + '</button>'
   ).join('');
 
   cedearsFiltered2 = [...cedearsData2].sort((a,b) => b.score - a.score);
